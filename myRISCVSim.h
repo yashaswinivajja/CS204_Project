@@ -1,95 +1,22 @@
 #include <stdlib.h>
 #include <stdio.h>
-int PC;
 
 // Register file
 static unsigned int X[32];
 // flags
 // memory
 static char MEM[4000];
-int Machinecode[1000];
+int Machinecode[1000][32];
 int leninst;
+int IR[32];
+int PC;
 
 // intermediate datapath and control path signals
 static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
 
-int hex(char letter)
-{
-    int x;
-    switch (letter)
-    {
-    case '1':
-        x = 1;
-        break;
-    case '2':
-        x = 2;
-        break;
-    case '3':
-        x = 3;
-        break;
-    case '4':
-        x = 4;
-        break;
-    case '5':
-        x = 5;
-        break;
-    case '6':
-        x = 6;
-        break;
-    case '7':
-        x = 7;
-        break;
-    case '8':
-        x = 8;
-        break;
-    case '9':
-        x = 9;
-        break;
-    case 'A':
-        x = 10;
-        break;
-    case 'B':
-        x = 11;
-        break;
-    case 'C':
-        x = 12;
-        break;
-    case 'D':
-        x = 13;
-        break;
-    case 'E':
-        x = 14;
-        break;
-    case 'F':
-        x = 15;
-        break;
-    default:
-        break;
-    }
-    return x;
-}
 
-void hextobin(char Instruction_word[],int *arry)
-{
-    int b[5] , j = 0, num, rem;
-    for (int i = 0; i < 8; i++)
-    {
-        num = hex(Instruction_word[i]);
-        while (j < 4)
-        {
-            rem = num % 2;
-            num = num / 2;
-            b[j] = rem;
-            j++;
-        }
-        for (int j = 0; j < 4; j++)
-        {
-            arry[31 - (4 * i) - j] = b[3 - j];
-        }
-    }
-}
 
 void bintodec(char bin[],int size)
 {
@@ -102,7 +29,7 @@ void bintodec(char bin[],int size)
 
 void dectobin(int num,int *b,int size)
 {
-    int rem, i;
+    int rem, i=0;
     if (num >= 0)
     {
         int array[size+1];
@@ -154,8 +81,8 @@ void run_riscvsim()
 {
     while (1)
     {
-        fetch();
-        decode();
+        int IR = fetch();
+        decode(IR);
         execute();
         mem();
         write_back();
@@ -186,7 +113,7 @@ void write_word(char *mem, unsigned int address, unsigned int data);
 void load_program_memory(char *file_name)
 {
     FILE *fp;
-    unsigned int address, instruction;
+    int address, instruction;
     fp = fopen(file_name, "r");
     if (fp == NULL)
     {
@@ -196,7 +123,10 @@ void load_program_memory(char *file_name)
     int i=0;
     while (fscanf(fp, "%x %x", &address, &instruction) != EOF)
     {
-        Machinecode[i]=instruction;
+        int Arr[32];
+        dectobin(instruction,Arr,32);
+        for(int j=0;j<32;j++)
+        Machinecode[i][j]=Arr[j];
         write_word(MEM, address, instruction);
         i++;
     }
@@ -231,11 +161,11 @@ void swi_exit()
 }
 
 // reads from the instruction memory and updates the instruction register
-int fetch()
+
+int fetch(int *IR)
 {
-    int IR = Machinecode[PC/4];
-    PC=+4;
-    return IR;
+    for(int i=0;i<32;i++)
+    IR[i] = Machinecode[PC/4][i];
 }
 // reads the instruction register, reads operand1, operand2 fromo register file, decides the operation to be performed in execute stage
 int decode(int IR)

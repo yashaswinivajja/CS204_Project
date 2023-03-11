@@ -10,7 +10,7 @@ void Fetch(char line);
 
 }
 void Decode();
-void Execute();
+void Executes();
 void Memory();
 void WriteBack();
 

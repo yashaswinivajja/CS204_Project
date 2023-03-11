@@ -2,11 +2,13 @@
 #include <stdio.h>
 int PC;
 
-    // Register file
-    static unsigned int X[32];
+// Register file
+static unsigned int X[32];
 // flags
 // memory
 static char MEM[4000];
+int Machinecode[1000];
+int leninst;
 
 // intermediate datapath and control path signals
 static unsigned int instruction_word;
@@ -164,6 +166,16 @@ void run_riscvsim()
 // reset all registers and memory content to 0
 void reset_proc()
 {
+    for(int i=0;i<4000;i++)
+    {
+        if(i<32)
+        {
+            X[i]=0;
+            MEM[i]=0;
+        }
+        else
+            MEM[i]=0;
+    }
 }
 
 int read_word(char *mem, unsigned int address);
@@ -181,11 +193,15 @@ void load_program_memory(char *file_name)
         printf("Error opening input mem file\n");
         exit(1);
     }
+    int i=0;
     while (fscanf(fp, "%x %x", &address, &instruction) != EOF)
     {
+        Machinecode[i]=instruction;
         write_word(MEM, address, instruction);
+        i++;
     }
     fclose(fp);
+    leninst=i;
 }
 
 // writes the data memory in "data_out.mem" file
@@ -215,11 +231,14 @@ void swi_exit()
 }
 
 // reads from the instruction memory and updates the instruction register
-void fetch()
+int fetch()
 {
+    int IR = Machinecode[PC/4];
+    PC=+4;
+    return IR;
 }
 // reads the instruction register, reads operand1, operand2 fromo register file, decides the operation to be performed in execute stage
-void decode()
+int decode(int IR)
 {
 }
 // executes the ALU operation based on ALUop

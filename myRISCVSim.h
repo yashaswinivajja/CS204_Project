@@ -12,6 +12,9 @@ int IR[32];
 int PC;
 
 
+
+
+
 // intermediate datapath and control path signals
 static unsigned int instruction_word;
 static unsigned int operand1;

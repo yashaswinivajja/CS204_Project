@@ -1,66 +1,66 @@
 #include <stdlib.h>
 #include <stdio.h>
-int PC
+int PC;
 
     // Register file
     static unsigned int X[32];
 // flags
 // memory
-static unsigned char MEM[4000];
+static char MEM[4000];
 
 // intermediate datapath and control path signals
 static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
 
-void hex(char letter)
+int hex(char letter)
 {
     int x;
     switch (letter)
     {
-    case 1:
+    case '1':
         x = 1;
         break;
-    case 2:
+    case '2':
         x = 2;
         break;
-    case 3:
+    case '3':
         x = 3;
         break;
-    case 4:
+    case '4':
         x = 4;
         break;
-    case 5:
+    case '5':
         x = 5;
         break;
-    case 6:
+    case '6':
         x = 6;
         break;
-    case 7:
+    case '7':
         x = 7;
         break;
-    case 8:
+    case '8':
         x = 8;
         break;
-    case 9:
+    case '9':
         x = 9;
         break;
-    case A:
+    case 'A':
         x = 10;
         break;
-    case B:
+    case 'B':
         x = 11;
         break;
-    case C:
+    case 'C':
         x = 12;
         break;
-    case D:
+    case 'D':
         x = 13;
         break;
-    case E:
+    case 'E':
         x = 14;
         break;
-    case F:
+    case 'F':
         x = 15;
         break;
     default:
@@ -69,10 +69,10 @@ void hex(char letter)
     return x;
 }
 
-void hextobin(char Instruction_word[],int *arry[])
+void hextobin(char Instruction_word[],int *arry)
 {
-    int b[], j = 0, num, rem;
-    for (i = 0; i < 8; i++)
+    int b[5] , j = 0, num, rem;
+    for (int i = 0; i < 8; i++)
     {
         num = hex(Instruction_word[i]);
         while (j < 4)
@@ -98,12 +98,12 @@ void bintodec(char bin[],int size)
     }
 }
 
-void dectobin(int num,int *b[],int size)
+void dectobin(int num,int *b,int size)
 {
     int rem, i;
     if (num >= 0)
     {
-        int array[];
+        int array[size+1];
         while (i < size)
         {
             rem = num % 2;
@@ -118,7 +118,7 @@ void dectobin(int num,int *b[],int size)
     }
     else
     {
-        int a1[], a2[], carry;
+        int a1[size+1], a2[size+1], carry;
         num = num * (-1);
         while (i < size)
         {
@@ -165,6 +165,9 @@ void run_riscvsim()
 void reset_proc()
 {
 }
+
+int read_word(char *mem, unsigned int address);
+void write_word(char *mem, unsigned int address, unsigned int data);
 
 // load_program_memory reads the input memory, and pupulates the instruction
 //  memory

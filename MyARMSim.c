@@ -16,6 +16,8 @@ void WriteBack();
 
 int main()
 {
+    
+    
     char name[100], line[15];
     FILE *file;
     char *buffer;

@@ -1,21 +1,3 @@
-
-/* 
-
-The project is developed as part of Computer Architecture class
-Project Name: Functional Simulator for subset of RISCV Processor
-
-Developer's Name:
-Developer's Email id:
-Date: 
-
-*/
-
-
-/* myRISCVSim.cpp
-   Purpose of this file: implementation file for myRISCVSim
-*/
-
-#include "myRISCVSim.h"
 #include <stdlib.h>
 #include <stdio.h>
 

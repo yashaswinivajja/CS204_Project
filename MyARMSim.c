@@ -5,7 +5,7 @@ void Fetch(char line);
 {
 
 }
-void Decode();
+void Decoding();
 void Execute();
 void Memory();
 void WriteBack();

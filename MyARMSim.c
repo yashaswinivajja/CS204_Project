@@ -24,6 +24,11 @@ int main()
     gets(name);
 
     file = fopen(name, "r"); // opens the file in read mode
+    
+    
+    
+    
+    
 
     if (file == NULL) // if the file is empty then it prints error
     {

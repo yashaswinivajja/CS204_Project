@@ -14,6 +14,10 @@ void Executes();
 void Memory();
 void WriteBack();
 
+
+
+
+
 int main()
 {
     

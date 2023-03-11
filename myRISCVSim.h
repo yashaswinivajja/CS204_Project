@@ -15,12 +15,12 @@ int PC;
 
 
 
+
+
 // intermediate datapath and control path signals
 static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
-
-
 
 void bintodec(char bin[],int size)
 {

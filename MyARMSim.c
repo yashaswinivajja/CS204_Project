@@ -10,9 +10,12 @@ void Fetch(char line);
 
 }
 void Decoding();
-void Execute();
+void Executes();
 void Memory();
 void WriteBack();
+
+
+
 
 int main()
 {

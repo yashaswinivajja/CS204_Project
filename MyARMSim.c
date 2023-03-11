@@ -52,5 +52,7 @@ int main()
     }
     fclose(file); // closing the file
 
+    
+    
     Fetch(line);
 }

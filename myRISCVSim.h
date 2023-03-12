@@ -6,7 +6,7 @@
 static unsigned int X[32];
 // flags
 // memory
-static char MEM[4000];
+static int MEM[4000];
 int Machinecode[1000][32];
 int leninst;
 int IR[32];
@@ -382,11 +382,21 @@ void decode(int IR[],int *arguments)
     }
     else if(Opcode==55)
     {//lui
+        for(int i=19;i>=0;i--)
+        {
+            imm[i]=IR[12+i];
+        }
+        Imm = bintodec(imm ,20,1);
         operation = 25;
         printf("Operation: lui rd: %d imm: %d",RD,Imm);
     }
     else if(Opcode==23)
     {//auipc
+    for(int i=19;i>=0;i--)
+        {
+            imm[i]=IR[12+i];
+        }
+        Imm = bintodec(imm ,20,1);
         operation = 26;
         printf("Operation: auipc rd: %d imm: %d",RD,Imm);
     }

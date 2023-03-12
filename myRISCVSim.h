@@ -325,7 +325,7 @@ void decode(int IR[],int *arguments)
         if(fun3==0){
             //sb
             operation=17;
-            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);       
+            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);            
         }
         else if(fun3==1){
             //sh

@@ -301,6 +301,7 @@ void decode(int IR[],int *arguments)
     {
         if(fun3==0){
             //jalr
+            operation=16;
         }
     }
     else if(Opcode==35)
@@ -317,17 +318,17 @@ void decode(int IR[],int *arguments)
         Imm=bintodec(imm,12);
         if(fun3==0){
             //sb
-            operation=16;
+            operation=17;
             printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
         }
         else if(fun3==1){
             //sh
-            operation=17;
+            operation=18;
             printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
         }
         else if(fun3==2){
             //sw
-            operation=18;
+            operation=19;
             printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
         }
     }

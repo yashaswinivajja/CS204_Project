@@ -17,7 +17,7 @@ static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
 
-void bintodec(char bin[], int size)
+int bintodec(int bin[], int size)
 {
     int dec = 0, j = 0;
     for (int i = size - 1; i >= 0; i--)
@@ -25,6 +25,7 @@ void bintodec(char bin[], int size)
         dec = dec + (bin[i] * (2 ^ j));
         j++;
     }
+    return dec;
 }
 
 void dectobin(int num, int *b, int size)
@@ -78,8 +79,8 @@ void dectobin(int num, int *b, int size)
 }
 
 void fetch(int *IR);
-int decode(int IR[]);
-void execute();
+void decode(int IR[],int *arguments);
+void execute(int arguments[]);
 void memory_access();
 void write_back();
 
@@ -175,9 +176,9 @@ void fetch(int *IR)
 }
 
 // reads the instruction register, reads operand1, operand2 fromo register file, decides the operation to be performed in execute stage
-int decode(int IR[],int *arguments[])
+void decode(int IR[],int *arguments)
 {
-    char opcode[8], func3[4], func7[8], rs1[6], rs2[6], rd[6], imm[21];
+    int opcode[8], func3[4], func7[8], rs1[6], rs2[6], rd[6], imm[21];
     int RS1, RS2, RD, Opcode, fun7, fun3,operation;
     // opcode=IR[6:0]    func3=IR[14:12] rd=IR[11:7] rs1=IR[19:15]   rs2=IR[24:20]   func7=IR[31:25]
     for (int i = 0; i <= 6; i++)
@@ -253,44 +254,70 @@ int decode(int IR[],int *arguments[])
     }
     if(Opcode==19)
     {
-        if(func3==0){
+        for(int i=11;i>=0;i--)
+        {
+            imm[i]=IR[20+i]
+        }
+        Imm=bintodec(imm,12);       
+        if(fun3==0){
             //addi
+            operation=10;
+            printf("Operation: addi rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
-        if(func3==7){
+        if(fun3==7){
             //andi
+            operation=11;
+            printf("Operation: addi rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
         }
-        if(func3==6){
+        if(fun3==6){
             //ori
+            operation=12;
+            printf("Operation: addi rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
         }
     }
     if(Opcode==3)
     {
-        if(func3==0){
+        if(fun3==0){
             //lb
         }
-        if(func3==1){
+        if(fun3==1){
             //lh
         }
-        if(func3==2){
+        if(fun3==2){
             //lw
         }
     }
     if(Opcode==103)
     {
-        if(func3==0){
+        if(fun3==0){
             //jalr
         }
     }
     if(Opcode==35)
     {
-        if(func3==0){
+        if(fun3==0){
             //sb
         }
-        if(func3==1){
+        if(fun3==1){
             //sh
         }
-        if(func3==2){
+        if(fun3==2){
             //sw
+        }
+    }
+    if(Opcode==101)
+    {
+        if(fun3==0){
+            //beq
+        }
+        if(fun3==1){
+            //bne
+        }
+        if(fun3==5){
+            //bge
+        }
+        if(fun3==4){
+            //blt
         }
     }
 }

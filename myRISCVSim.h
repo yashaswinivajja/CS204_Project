@@ -11,6 +11,7 @@ int Machinecode[1000][32];
 int leninst;
 int IR[32];
 int PC;
+int arguments[5];
 
 // intermediate datapath and control path signals
 static unsigned int instruction_word;
@@ -90,8 +91,8 @@ void run_riscvsim()
     {
         int IR[32];
         fetch(IR);
-        decode(IR);
-        execute();
+        decode(IR,arguments);
+        execute(arguments);
         memory_access();
         write_back();
     }
@@ -179,7 +180,7 @@ void fetch(int *IR)
 void decode(int IR[],int *arguments)
 {
     int opcode[8], func3[4], func7[8], rs1[6], rs2[6], rd[6], imm[21];
-    int RS1, RS2, RD, Opcode, fun7, fun3,operation;
+    int RS1, RS2, RD, Opcode, fun7, fun3,operation,Imm=0;
     // opcode=IR[6:0]    func3=IR[14:12] rd=IR[11:7] rs1=IR[19:15]   rs2=IR[24:20]   func7=IR[31:25]
     for (int i = 0; i <= 6; i++)
     {
@@ -207,105 +208,90 @@ void decode(int IR[],int *arguments)
             operation=1;
             printf("operation: add rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
-        if(fun3==0 && fun7==32)
+        else if(fun3==0 && fun7==32)
         {//sub
             operation=2;
             printf("operation: sub rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
-        if(fun3==1)
+        else if(fun3==1)
         {//sll
             operation=3;
             printf("operation: sll rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
-        if(fun3==2)
+        else if(fun3==2)
         {//slt
             operation=4;
             printf("operation: slt rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
-        if(fun3==4)
+        else if(fun3==4)
         {//xor
             operation=5;
             printf("operation: xor rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
-        if(fun3==6)
+        else if(fun3==6)
         {//or
             operation=6;
             printf("operation: or rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
-        if(fun3==7)
+        else if(fun3==7)
         {//and
             operation=7;
             printf("operation: and rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
-        if(fun3==5 && fun7==0)
+        else if(fun3==5 && fun7==0)
         {//srl
             operation=8;
             printf("operation: srl rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
-        if(fun3==5 && fun7==32)
+        else if(fun3==5 && fun7==32)
         {//sra
             operation=9;
             printf("operation: sra rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
-        arguments[0]=operation;
-        arguments[1]=RS1;
-        arguments[2]=RS2;
-        arguments[3]=RD;
     }
-    if(Opcode==19)
+    else if(Opcode==19)
     {
         for(int i=11;i>=0;i--)
         {
-            imm[i]=IR[20+i]
+            imm[i]=IR[20+i];
         }
-        Imm=bintodec(imm,12);       
+        Imm = bintodec(imm,12);       
         if(fun3==0){
             //addi
             operation=10;
             printf("Operation: addi rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
-        if(fun3==7){
+        else if(fun3==7){
             //andi
             operation=11;
-            printf("Operation: addi rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
+            printf("Operation: andi rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
-        if(fun3==6){
+        else if(fun3==6){
             //ori
             operation=12;
-            printf("Operation: addi rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
+            printf("Operation: ori rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
+        
     }
-    if(Opcode==3)
+    else if(Opcode==3)
     {
-        for(int i=11;i>=0;i--)
-        {
-            imm[i]=IR[20+i]
-        }
-        Imm=bintodec(imm,12); 
         if(fun3==0){
             //lb
-            operation=13;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
-            
         }
-        if(fun3==1){
+        else if(fun3==1){
             //lh
-            operation=14;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
         }
-        if(fun3==2){
+        else if(fun3==2){
             //lw
-            operation=15;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
         }
     }
-    if(Opcode==103)
+    else if(Opcode==103)
     {
         if(fun3==0){
             //jalr
         }
     }
-    if(Opcode==35)
+    else if(Opcode==35)
     {
         for(int i=11;i>=0;i--)
         {
@@ -322,32 +308,55 @@ void decode(int IR[],int *arguments)
             operation=16;
             printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
         }
-        if(fun3==1){
+        else if(fun3==1){
             //sh
             operation=17;
             printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
         }
-        if(fun3==2){
+        else if(fun3==2){
             //sw
             operation=18;
             printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
         }
     }
-    if(Opcode==101)
+    else if(Opcode==101)
     {
+        for(int i=11;i>=0;i--)
+        {
+            imm[11]=IR[31];
+            imm[10]=IR[7];
+            if(i<=9 && i>=4)
+            imm[i]=IR[21+i];
+            else if(i<=3 && i>=0)
+            imm[i]=IR[8+i];
+        }
+        Imm=bintodec(imm,12);
         if(fun3==0){
+            operation = 20;
+            printf("Operation: beq rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
             //beq
         }
-        if(fun3==1){
+        else if(fun3==1){
+            operation = 21;
+            printf("Operation: bne rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
             //bne
         }
-        if(fun3==5){
+        else if(fun3==5){
+            operation = 22;
+            printf("Operation: bge rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
             //bge
         }
-        if(fun3==4){
+        else if(fun3==4){
+            operation = 23;
+            printf("Operation: blt rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
             //blt
         }
     }
+    arguments[0]=operation;
+    arguments[1]=RS1;
+    arguments[2]=RS2;
+    arguments[3]=RD;
+    arguments[4]=Imm;
 }
 
 // executes the ALU operation based on ALUop

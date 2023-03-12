@@ -18,7 +18,7 @@ static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
 
-int bintodec(int bin[], int size, bool k)
+int bintodec(int bin[], int size, int k)
 {
     int dec = 0, j = 1;
     for (int i = size - 1; i > 0; i--)
@@ -377,7 +377,7 @@ void decode(int IR[],int *arguments)
     }
     else if(Opcode==111)
     {
-        for(i=20;i>0;i--)
+        for(int i=20;i>0;i--)
         {
             if(i==20)
             {
@@ -431,6 +431,65 @@ void decode(int IR[],int *arguments)
 // executes the ALU operation based on ALUop
 void execute(int arguments[])
 {
+    int operation=arguments[0];
+    int rs1_=arguments[1];
+    int rs2_=arguments[2];
+    int rd_=arguments[3];
+    int imm_=arguments[4];
+    int ALU_output;
+    switch(operation)
+    {
+        case 1:
+        ALU_output=X[rs1_]+X[rs2_];
+        printf("ALU output of the add instruction is %d",ALU_output);
+        break;
+        case 2:
+        ALU_output=X[rs1_]-X[rs2_];
+        printf("ALU output of the sub instruction is %d",ALU_output);
+        break;
+        case 3:
+        ALU_output=X[rs1_]<<X[rs2_];
+        printf("ALU output of the sll instruction is %d",ALU_output);
+        break;
+        case 4:
+        ALU_output=X[rs1_]<<X[rs2_];
+        printf("ALU output of the slt instruction is %d",ALU_output);   //slt
+        break;
+        case 5:
+        ALU_output=X[rs1_]^X[rs2_];
+        printf("ALU output of the xor instruction is %d",ALU_output);
+        break;
+        case 6:
+        ALU_output=X[rs1_]|X[rs2_];
+        printf("ALU output of the or instruction is %d",ALU_output);
+        break;
+        case 7:
+        ALU_output=X[rs1_]&X[rs2_];
+        printf("ALU output of the sll instruction is %d",ALU_output);
+        break;
+        case 8:
+        ALU_output=X[rs1_]<<X[rs2_];
+        printf("ALU output of the srl instruction is %d",ALU_output);   //srl
+        break;
+        case 9:
+        ALU_output=X[rs1_]<<X[rs2_];
+        printf("ALU output of the sra instruction is %d",ALU_output);   //sra
+        break;
+        case 10:
+        ALU_output=X[rs1_]+imm_;
+        printf("ALU output of the addi instruction is %d",ALU_output);   
+        break;
+        case 11:
+        ALU_output=X[rs1_]&imm_;
+        printf("ALU output of the andi instruction is %d",ALU_output);   
+        break;
+        case 12:
+        ALU_output=X[rs1_]|imm_;
+        printf("ALU output of the ori instruction is %d",ALU_output);   
+        break;
+        default:
+        break;
+    }
 }
 
 // perform the memory operation

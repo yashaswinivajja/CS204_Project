@@ -1,7 +1,6 @@
 #include <stdlib.h>
-
-
 #include <stdio.h>
+#include<string.h>
 
 // Register file
 static unsigned int X[32];
@@ -12,14 +11,6 @@ int Machinecode[1000][32];
 int leninst;
 int IR[32];
 int PC;
-
-
-
-
-
-
-
-
 
 // intermediate datapath and control path signals
 static unsigned int instruction_word;
@@ -85,14 +76,21 @@ void dectobin(int num,int *b,int size)
     }
 }
 
+void fetch(int *IR);
+int decode(int IR[]);
+void execute();
+void memory_access();
+void write_back();
+
 void run_riscvsim()
 {
-    while (1)
+    while (PC<=((leninst-1)*4))
     {
-        int IR = fetch();
+        int IR[32];
+        fetch(IR);
         decode(IR);
         execute();
-        mem();
+        memory_access();
         write_back();
     }
 }
@@ -169,15 +167,27 @@ void swi_exit()
 }
 
 // reads from the instruction memory and updates the instruction register
-int fetch(int *IR)
+void fetch(int *IR)
 {
     for(int i=0;i<32;i++)
     IR[i] = Machinecode[PC/4][i];
 }
 
 // reads the instruction register, reads operand1, operand2 fromo register file, decides the operation to be performed in execute stage
-int decode(int IR)
+int decode(int IR[])
 {
+    char opcode[8],func3[4],func7[8],rs1[6],rs2[6],rd[6],imm[21],operation[10];
+    int RS1,RS2,RD;
+    //opcode=IR[6:0]    func3=IR[14:12] rd=IR[11:7] rs1=IR[19:15]   rs2=IR[24:20]   func7=IR[31:25]
+    if(opcode=="0110011")
+    {
+        if(func3=="000" && func7=="0000000")    //string type checking!
+        {
+            operation="add";
+            printf("The operation is add\trs1:%d\trs2:%d\trd:%d\n",RS1,RS2,RD);
+            //for execute we need to pass RS1,RS2,RD,operation
+        }
+    }
 }
 
 // executes the ALU operation based on ALUop
@@ -186,7 +196,7 @@ void execute()
 }
 
 // perform the memory operation
-void mem()
+void memory_access()
 {
 }
 

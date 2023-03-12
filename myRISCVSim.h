@@ -277,14 +277,26 @@ void decode(int IR[],int *arguments)
     }
     if(Opcode==3)
     {
+        for(int i=11;i>=0;i--)
+        {
+            imm[i]=IR[20+i]
+        }
+        Imm=bintodec(imm,12); 
         if(fun3==0){
             //lb
+            operation=13;
+            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
+            
         }
         if(fun3==1){
             //lh
+            operation=14;
+            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
         }
         if(fun3==2){
             //lw
+            operation=15;
+            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
         }
     }
     if(Opcode==103)

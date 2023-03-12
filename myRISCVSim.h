@@ -175,7 +175,7 @@ void fetch(int *IR)
 }
 
 // reads the instruction register, reads operand1, operand2 fromo register file, decides the operation to be performed in execute stage
-int decode(int IR[])
+int decode(int IR[],int *arguments[])
 {
     char opcode[8], func3[4], func7[8], rs1[6], rs2[6], rd[6], imm[21];
     int RS1, RS2, RD, Opcode, fun7, fun3,operation;
@@ -201,43 +201,55 @@ int decode(int IR[])
     RD = bintodec(rd, 5);
     if(Opcode==51)
     {
-        if(fun3==0 && fun7==0)
-        {
-
-            //add
+       if(fun3==0 && fun7==0)
+        {//add
+            operation=1;
+            printf("operation: add rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
         if(fun3==0 && fun7==32)
-        {
-            //sub
+        {//sub
+            operation=2;
+            printf("operation: sub rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
         if(fun3==1)
-        {
-            //sll
+        {//sll
+            operation=3;
+            printf("operation: sll rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
         if(fun3==2)
-        {
-            //slt
+        {//slt
+            operation=4;
+            printf("operation: slt rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
         if(fun3==4)
-        {
-            //xor
+        {//xor
+            operation=5;
+            printf("operation: xor rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
         if(fun3==6)
-        {
-            //or
+        {//or
+            operation=6;
+            printf("operation: or rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
         if(fun3==7)
-        {
-            //and
+        {//and
+            operation=7;
+            printf("operation: and rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
         if(fun3==5 && fun7==0)
-        {
-            //srl
+        {//srl
+            operation=8;
+            printf("operation: srl rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
         if(fun3==5 && fun7==32)
-        {
-            //sra
+        {//sra
+            operation=9;
+            printf("operation: sra rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
         }
+        arguments[0]=operation;
+        arguments[1]=RS1;
+        arguments[2]=RS2;
+        arguments[3]=RD;
     }
     if(Opcode==19)
     {
@@ -284,7 +296,7 @@ int decode(int IR[])
 }
 
 // executes the ALU operation based on ALUop
-void execute()
+void execute(int arguments[])
 {
 }
 

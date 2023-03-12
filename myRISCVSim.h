@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include<string.h>
+#include <string.h>
 
 // Register file
 static unsigned int X[32];
@@ -17,21 +17,22 @@ static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
 
-void bintodec(char bin[],int size)
+void bintodec(char bin[], int size)
 {
-    int dec=0,j=0;
-    for(int i=size-1;i>=0;i--){
-        dec=dec+(bin[i]*(2^j));
+    int dec = 0, j = 0;
+    for (int i = size - 1; i >= 0; i--)
+    {
+        dec = dec + (bin[i] * (2 ^ j));
         j++;
     }
 }
 
-void dectobin(int num,int *b,int size)
+void dectobin(int num, int *b, int size)
 {
-    int rem, i=0;
+    int rem, i = 0;
     if (num >= 0)
     {
-        int array[size+1];
+        int array[size + 1];
         while (i < size)
         {
             rem = num % 2;
@@ -39,14 +40,14 @@ void dectobin(int num,int *b,int size)
             array[i] = rem;
             i++;
         }
-        for (i = size-1; i >= 0; i--)
+        for (i = size - 1; i >= 0; i--)
         {
-            b[size-1-i]=array[i];
+            b[size - 1 - i] = array[i];
         }
     }
     else
     {
-        int a1[size+1], a2[size+1], carry;
+        int a1[size + 1], a2[size + 1], carry;
         num = num * (-1);
         while (i < size)
         {
@@ -69,9 +70,9 @@ void dectobin(int num,int *b,int size)
             a1[i] = (a2[i] + carry) % 2;
             carry = (carry + a2[i]) / 2;
         }
-        for (i = size-1; i >= 0; i--)
+        for (i = size - 1; i >= 0; i--)
         {
-            b[size-1-i]=a1[i];
+            b[size - 1 - i] = a1[i];
         }
     }
 }
@@ -84,7 +85,7 @@ void write_back();
 
 void run_riscvsim()
 {
-    while (PC<=((leninst-1)*4))
+    while (PC <= ((leninst - 1) * 4))
     {
         int IR[32];
         fetch(IR);
@@ -99,15 +100,15 @@ void run_riscvsim()
 // reset all registers and memory content to 0
 void reset_proc()
 {
-    for(int i=0;i<4000;i++)
+    for (int i = 0; i < 4000; i++)
     {
-        if(i<32)
+        if (i < 32)
         {
-            X[i]=0;
-            MEM[i]=0;
+            X[i] = 0;
+            MEM[i] = 0;
         }
         else
-            MEM[i]=0;
+            MEM[i] = 0;
     }
 }
 
@@ -126,18 +127,18 @@ void load_program_memory(char *file_name)
         printf("Error opening input mem file\n");
         exit(1);
     }
-    int i=0;
+    int i = 0;
     while (fscanf(fp, "%x %x", &address, &instruction) != EOF)
     {
         int Arr[32];
-        dectobin(instruction,Arr,32);
-        for(int j=0;j<32;j++)
-        Machinecode[i][j]=Arr[j];
+        dectobin(instruction, Arr, 32);
+        for (int j = 0; j < 32; j++)
+            Machinecode[i][j] = Arr[j];
         write_word(MEM, address, instruction);
         i++;
     }
     fclose(fp);
-    leninst=i;
+    leninst = i;
 }
 
 // writes the data memory in "data_out.mem" file
@@ -169,23 +170,73 @@ void swi_exit()
 // reads from the instruction memory and updates the instruction register
 void fetch(int *IR)
 {
-    for(int i=0;i<32;i++)
-    IR[i] = Machinecode[PC/4][i];
+    for (int i = 0; i < 32; i++)
+        IR[i] = Machinecode[PC / 4][31 - i];
 }
 
 // reads the instruction register, reads operand1, operand2 fromo register file, decides the operation to be performed in execute stage
 int decode(int IR[])
 {
-    char opcode[8],func3[4],func7[8],rs1[6],rs2[6],rd[6],imm[21],operation[10];
-    int RS1,RS2,RD;
-    //opcode=IR[6:0]    func3=IR[14:12] rd=IR[11:7] rs1=IR[19:15]   rs2=IR[24:20]   func7=IR[31:25]
-    if(opcode=="0110011")
+    char opcode[8], func3[4], func7[8], rs1[6], rs2[6], rd[6], imm[21];
+    int RS1, RS2, RD, Opcode, fun7, fun3,operation;
+    // opcode=IR[6:0]    func3=IR[14:12] rd=IR[11:7] rs1=IR[19:15]   rs2=IR[24:20]   func7=IR[31:25]
+    for (int i = 0; i <= 6; i++)
     {
-        if(func3=="000" && func7=="0000000")    //string type checking!
+        opcode[i] = IR[6 - i];
+        func7[i] = IR[31 - i];
+        if (i <= 2)
+            func3[i] = IR[14 - i];
+    }
+    Opcode = bintodec(opcode, 7);
+    fun7 = bintodec(func7, 7);
+    fun3 = bintodec(func3, 3);
+    for (int i = 0; i <= 4; i++)
+    {
+        rs1[i] = IR[19 - i];
+        rs2[i] = IR[24 - i];
+        rd[i] = IR[11 - i];
+    }
+    RS1 = bintodec(rs1, 5);
+    RS2 = bintodec(rs2, 5);
+    RD = bintodec(rd, 5);
+    if(Opcode==51)
+    {
+        if(fun3==0 && fun7==0)
         {
-            operation="add";
-            printf("The operation is add\trs1:%d\trs2:%d\trd:%d\n",RS1,RS2,RD);
-            //for execute we need to pass RS1,RS2,RD,operation
+
+            //add
+        }
+        if(fun3==0 && fun7==32)
+        {
+            //sub
+        }
+        if(fun3==1)
+        {
+            //sll
+        }
+        if(fun3==2)
+        {
+            //slt
+        }
+        if(fun3==4)
+        {
+            //xor
+        }
+        if(fun3==6)
+        {
+            //or
+        }
+        if(fun3==7)
+        {
+            //and
+        }
+        if(fun3==5 && fun7==0)
+        {
+            //srl
+        }
+        if(fun3==5 && fun7==32)
+        {
+            //sra
         }
     }
 }

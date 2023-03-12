@@ -277,31 +277,37 @@ void decode(int IR[],int *arguments)
     {
         for(int i=11;i>=0;i--)
         {
-            imm[i]=IR[20+i]
+            imm[i]=IR[20+i];
         }
         Imm=bintodec(imm,12); 
         if(fun3==0){
             //lb
             operation=13;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
+            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);
             
         }
         else if(fun3==1){
             //lh
             operation=14;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
+            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
         else if(fun3==2){
             //lw
             operation=15;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,,RD,Imm);
+            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
     }
     else if(Opcode==103)
     {
+        for(int i=11;i>=0;i--)
+        {
+            imm[i]=IR[20+i];
+        }
+        Imm = bintodec(imm,12);
         if(fun3==0){
             //jalr
             operation=16;
+            printf("Operation: jalr rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
     }
     else if(Opcode==35)
@@ -319,17 +325,17 @@ void decode(int IR[],int *arguments)
         if(fun3==0){
             //sb
             operation=17;
-            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
+            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);            
         }
         else if(fun3==1){
             //sh
             operation=18;
-            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
+            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);       
         }
         else if(fun3==2){
             //sw
             operation=19;
-            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
+            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);       
         }
     }
     else if(Opcode==101)

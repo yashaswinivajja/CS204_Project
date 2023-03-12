@@ -307,14 +307,30 @@ void decode(int IR[],int *arguments)
     }
     if(Opcode==35)
     {
+        for(int i=11;i>=0;i--)
+        {
+            if(i<=11 && i>=5){
+                imm[i]=IR[20+i];
+            }
+            else if(i<=4 && i>=0){
+                imm[i]=IR[i+7];
+            }
+        }
+        Imm=bintodec(imm,12);
         if(fun3==0){
             //sb
+            operation=16;
+            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
         }
         if(fun3==1){
             //sh
+            operation=17;
+            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
         }
         if(fun3==2){
             //sw
+            operation=18;
+            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,,RS2,Imm);       
         }
     }
     if(Opcode==101)

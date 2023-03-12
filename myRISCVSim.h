@@ -239,6 +239,48 @@ int decode(int IR[])
             //sra
         }
     }
+    if(Opcode==19)
+    {
+        if(func3==0){
+            //addi
+        }
+        if(func3==7){
+            //andi
+        }
+        if(func3==6){
+            //ori
+        }
+    }
+    if(Opcode==3)
+    {
+        if(func3==0){
+            //lb
+        }
+        if(func3==1){
+            //lh
+        }
+        if(func3==2){
+            //lw
+        }
+    }
+    if(Opcode==103)
+    {
+        if(func3==0){
+            //jalr
+        }
+    }
+    if(Opcode==35)
+    {
+        if(func3==0){
+            //sb
+        }
+        if(func3==1){
+            //sh
+        }
+        if(func3==2){
+            //sw
+        }
+    }
 }
 
 // executes the ALU operation based on ALUop

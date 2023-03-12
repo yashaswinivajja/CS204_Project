@@ -18,14 +18,18 @@ static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
 
-int bintodec(int bin[], int size)
+int bintodec(int bin[], int size, bool k)
 {
-    int dec = 0, j = 0;
-    for (int i = size - 1; i >= 0; i--)
+    int dec = 0, j = 1;
+    for (int i = size - 1; i > 0; i--)
     {
-        dec = dec + (bin[i] * (2 ^ j));
-        j++;
+        dec = dec + (bin[i] * (j));
+        j=j*2;
     }
+    if(k==1)
+    dec=dec+((-1)*j*bin[0]);
+    else
+    dec = dec+(j*bin[0]);
     return dec;
 }
 
@@ -189,18 +193,18 @@ void decode(int IR[],int *arguments)
         if (i <= 2)
             func3[i] = IR[14 - i];
     }
-    Opcode = bintodec(opcode, 7);
-    fun7 = bintodec(func7, 7);
-    fun3 = bintodec(func3, 3);
+    Opcode = bintodec(opcode, 7,0);
+    fun7 = bintodec(func7, 7,0);
+    fun3 = bintodec(func3, 3,0);
     for (int i = 0; i <= 4; i++)
     {
         rs1[i] = IR[19 - i];
         rs2[i] = IR[24 - i];
         rd[i] = IR[11 - i];
     }
-    RS1 = bintodec(rs1, 5);
-    RS2 = bintodec(rs2, 5);
-    RD = bintodec(rd, 5);
+    RS1 = bintodec(rs1, 5,0);
+    RS2 = bintodec(rs2, 5,0);
+    RD = bintodec(rd, 5,0);
     if(Opcode==51)
     {
        if(fun3==0 && fun7==0)
@@ -255,7 +259,7 @@ void decode(int IR[],int *arguments)
         {
             imm[i]=IR[20+i];
         }
-        Imm = bintodec(imm,12);       
+        Imm = bintodec(imm,12,1);       
         if(fun3==0){
             //addi
             operation=10;
@@ -279,7 +283,7 @@ void decode(int IR[],int *arguments)
         {
             imm[i]=IR[20+i];
         }
-        Imm=bintodec(imm,12); 
+        Imm=bintodec(imm,12,1); 
         if(fun3==0){
             //lb
             operation=13;
@@ -303,7 +307,7 @@ void decode(int IR[],int *arguments)
         {
             imm[i]=IR[20+i];
         }
-        Imm = bintodec(imm,12);
+        Imm = bintodec(imm,12,1);
         if(fun3==0){
             //jalr
             operation=16;
@@ -321,7 +325,7 @@ void decode(int IR[],int *arguments)
                 imm[i]=IR[i+7];
             }
         }
-        Imm=bintodec(imm,12);
+        Imm=bintodec(imm,12,1);
         if(fun3==0){
             //sb
             operation=17;
@@ -349,7 +353,7 @@ void decode(int IR[],int *arguments)
             else if(i<=3 && i>=0)
             imm[i]=IR[8+i];
         }
-        Imm=bintodec(imm,12);
+        Imm=bintodec(imm,12,1);
         if(fun3==0){
             operation = 20;
             printf("Operation: beq rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
@@ -370,6 +374,21 @@ void decode(int IR[],int *arguments)
             printf("Operation: blt rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
             //blt
         }
+    }
+    else if(Opcode==111)
+    {//jal
+        operation = 24;
+        printf("Operation: jal rd: %d imm: %d",RD,Imm);
+    }
+    else if(Opcode==55)
+    {//lui
+        operation = 25;
+        printf("Operation: lui rd: %d imm: %d",RD,Imm);
+    }
+    else if(Opcode==23)
+    {//auipc
+        operation = 26;
+        printf("Operation: auipc rd: %d imm: %d",RD,Imm);
     }
     arguments[0]=operation;
     arguments[1]=RS1;

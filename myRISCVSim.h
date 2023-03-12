@@ -376,7 +376,28 @@ void decode(int IR[],int *arguments)
         }
     }
     else if(Opcode==111)
-    {//jal
+    {
+        for(i=20;i>0;i--)
+        {
+            if(i==20)
+            {
+                imm[i]=IR[11+i];
+            }
+            else if(i<=19 && i>=12)
+            {
+                imm[i]=IR[i];
+            }
+            if(i==11)
+            {
+                imm[i]=IR[i+9];
+            }
+            if(i<=10 && i>=1)
+            {
+                imm[i]=IR[20+i];
+            }
+        }
+        Imm=bintodec(imm,20,1);
+        //jal
         operation = 24;
         printf("Operation: jal rd: %d imm: %d",RD,Imm);
     }

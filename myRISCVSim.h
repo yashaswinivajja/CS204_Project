@@ -18,7 +18,7 @@ static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
 
-int bintodec(int bin[], int size, int k)
+int bintodec(int bin[], int size, bool k)
 {
     int dec = 0, j = 1;
     for (int i = size - 1; i > 0; i--)
@@ -86,7 +86,7 @@ void dectobin(int num, int *b, int size)
 void fetch(int *IR);
 void decode(int IR[],int *arguments);
 void execute(int arguments[]);
-void memory_access();
+void memory_access(int arguments[]);
 void write_back();
 
 void run_riscvsim()
@@ -97,7 +97,7 @@ void run_riscvsim()
         fetch(IR);
         decode(IR,arguments);
         execute(arguments);
-        memory_access();
+        memory_access(arguments);
         write_back();
     }
 }
@@ -376,28 +376,7 @@ void decode(int IR[],int *arguments)
         }
     }
     else if(Opcode==111)
-    {
-        for(int i=20;i>0;i--)
-        {
-            if(i==20)
-            {
-                imm[i]=IR[11+i];
-            }
-            else if(i<=19 && i>=12)
-            {
-                imm[i]=IR[i];
-            }
-            if(i==11)
-            {
-                imm[i]=IR[i+9];
-            }
-            if(i<=10 && i>=1)
-            {
-                imm[i]=IR[20+i];
-            }
-        }
-        Imm=bintodec(imm,20,1);
-        //jal
+    {//jal
         operation = 24;
         printf("Operation: jal rd: %d imm: %d",RD,Imm);
     }
@@ -431,70 +410,16 @@ void decode(int IR[],int *arguments)
 // executes the ALU operation based on ALUop
 void execute(int arguments[])
 {
-    int operation=arguments[0];
-    int rs1_=arguments[1];
-    int rs2_=arguments[2];
-    int rd_=arguments[3];
-    int imm_=arguments[4];
-    int ALU_output;
-    switch(operation)
-    {
-        case 1:
-        ALU_output=X[rs1_]+X[rs2_];
-        printf("ALU output of the add instruction is %d",ALU_output);
-        break;
-        case 2:
-        ALU_output=X[rs1_]-X[rs2_];
-        printf("ALU output of the sub instruction is %d",ALU_output);
-        break;
-        case 3:
-        ALU_output=X[rs1_]<<X[rs2_];
-        printf("ALU output of the sll instruction is %d",ALU_output);
-        break;
-        case 4:
-        ALU_output=X[rs1_]<<X[rs2_];
-        printf("ALU output of the slt instruction is %d",ALU_output);   //slt
-        break;
-        case 5:
-        ALU_output=X[rs1_]^X[rs2_];
-        printf("ALU output of the xor instruction is %d",ALU_output);
-        break;
-        case 6:
-        ALU_output=X[rs1_]|X[rs2_];
-        printf("ALU output of the or instruction is %d",ALU_output);
-        break;
-        case 7:
-        ALU_output=X[rs1_]&X[rs2_];
-        printf("ALU output of the sll instruction is %d",ALU_output);
-        break;
-        case 8:
-        ALU_output=X[rs1_]<<X[rs2_];
-        printf("ALU output of the srl instruction is %d",ALU_output);   //srl
-        break;
-        case 9:
-        ALU_output=X[rs1_]<<X[rs2_];
-        printf("ALU output of the sra instruction is %d",ALU_output);   //sra
-        break;
-        case 10:
-        ALU_output=X[rs1_]+imm_;
-        printf("ALU output of the addi instruction is %d",ALU_output);   
-        break;
-        case 11:
-        ALU_output=X[rs1_]&imm_;
-        printf("ALU output of the andi instruction is %d",ALU_output);   
-        break;
-        case 12:
-        ALU_output=X[rs1_]|imm_;
-        printf("ALU output of the ori instruction is %d",ALU_output);   
-        break;
-        default:
-        break;
-    }
 }
 
 // perform the memory operation
-void memory_access()
+void memory_access(int arguments[])
 {
+    if(arguments[0]==13|arguments[0]==14|arguments[0]==15)
+    {
+        
+    }
+    else if(arguments[0]==17|arguments[0]==18|arguments[0]==19);
 }
 
 // writes the results back to register file
@@ -502,14 +427,14 @@ void write_back()
 {
 }
 
-int read_word(char *mem, unsigned int address)
+int read_word(int *mem, unsigned int address)
 {
     int *data;
     data = (int *)(mem + address);
     return *data;
 }
 
-void write_word(char *mem, unsigned int address, unsigned int data)
+void write_word(int *mem, unsigned int address, unsigned int data)
 {
     int *data_p;
     data_p = (int *)(mem + address);

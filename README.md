@@ -6,9 +6,9 @@ Functional Simulator for RISCV Processor
 
 Team Members' names:
 Pedapudi Chaitanya    2021CSB1121
-Peguda Akshitha       2019CSB1122
-Shaik Darakshinda	   2019EEB1130
-Yashaswini Vajja      2019CSB1137
+Peguda Akshitha       2021CSB1122
+Shaik Darakshinda	2021CSB1130
+Yashaswini Vajja      2021CSB1137
                         
 README
 

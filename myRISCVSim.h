@@ -89,6 +89,8 @@ void decode(int IR[],int *arguments);
 void execute(int arguments[]);
 void memory_access(int arguments[]);
 void write_back();
+int read_word(char *mem, unsigned int address);
+void write_word(char *mem, unsigned int address, unsigned int data);
 
 void run_riscvsim()
 {
@@ -118,9 +120,6 @@ void reset_proc()
             MEM[i] = 0;
     }
 }
-
-int read_word(char *mem, unsigned int address);
-void write_word(char *mem, unsigned int address, unsigned int data);
 
 // load_program_memory reads the input memory, and pupulates the instruction
 //  memory
@@ -271,22 +270,21 @@ void decode(int IR[],int *arguments)
             imm[i]=IR[20+i];
         }
         Imm = bintodec(imm,12,1);       
-        if(fun3==0){
-            //addi
+        if(fun3==0)
+        {//addi
             operation=10;
             printf("Operation: addi rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
-        else if(fun3==7){
-            //andi
+        else if(fun3==7)
+        {//andi
             operation=11;
             printf("Operation: andi rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
-        else if(fun3==6){
-            //ori
+        else if(fun3==6)
+        {//ori
             operation=12;
             printf("Operation: ori rs1: %d rd: %d imm: %d",RS1,RD,Imm);
-        }
-        
+        } 
     }
    else if(Opcode==3)
     {
@@ -295,19 +293,18 @@ void decode(int IR[],int *arguments)
             imm[i]=IR[20+i];
         }
         Imm=bintodec(imm,12,1); 
-        if(fun3==0){
-            //lb
+        if(fun3==0)
+        {//lb
             operation=13;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);
-            
+            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);  
         }
-        else if(fun3==1){
-            //lh
+        else if(fun3==1)
+        {//lh
             operation=14;
             printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
-        else if(fun3==2){
-            //lw
+        else if(fun3==2)
+        {//lw
             operation=15;
             printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
@@ -319,8 +316,8 @@ void decode(int IR[],int *arguments)
             imm[i]=IR[20+i];
         }
         Imm = bintodec(imm,12,1);
-        if(fun3==0){
-            //jalr
+        if(fun3==0)
+        {//jalr
             operation=16;
             printf("Operation: jalr rs1: %d rd: %d imm: %d",RS1,RD,Imm);
         }
@@ -337,18 +334,18 @@ void decode(int IR[],int *arguments)
             }
         }
         Imm=bintodec(imm,12,1);
-        if(fun3==0){
-            //sb
+        if(fun3==0)
+        {//sb
             operation=17;
             printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);            
         }
-        else if(fun3==1){
-            //sh
+        else if(fun3==1)
+        {//sh
             operation=18;
             printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);       
         }
-        else if(fun3==2){
-            //sw
+        else if(fun3==2)
+        {//sw
             operation=19;
             printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);       
         }
@@ -365,25 +362,25 @@ void decode(int IR[],int *arguments)
             imm[i]=IR[8+i];
         }
         Imm=bintodec(imm,12,1);
-        if(fun3==0){
+        if(fun3==0)
+        {//beq
             operation = 20;
             printf("Operation: beq rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
-            //beq
         }
-        else if(fun3==1){
+        else if(fun3==1)
+        {//bne
             operation = 21;
             printf("Operation: bne rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
-            //bne
         }
-        else if(fun3==5){
+        else if(fun3==5)
+        {//bge
             operation = 22;
             printf("Operation: bge rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
-            //bge
         }
-        else if(fun3==4){
+        else if(fun3==4)
+        {//blt
             operation = 23;
-            printf("Operation: blt rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
-            //blt
+            printf("Operation: blt rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);   
         }
     }
     else if(Opcode==111)
@@ -403,7 +400,7 @@ void decode(int IR[],int *arguments)
     }
     else if(Opcode==23)
     {//auipc
-    for(int i=19;i>=0;i--)
+        for(int i=19;i>=0;i--)
         {
             imm[i]=IR[12+i];
         }
@@ -427,6 +424,7 @@ void execute(int arguments[])
     int rd_ = arguments[3];
     int imm_ = arguments[4];
     int ALU_output;
+    PC=PC+4;
     if (operation == 1)
     { // add
         ALU_output = X[rs1_] + X[rs2_];
@@ -493,7 +491,7 @@ void execute(int arguments[])
         printf("ALU output of the instruction is %d", ALU_output);
     }
     else if (operation == 20)
-    {
+    {//beq
         if (X[rs1_] == X[rs2_])
             ALU_output = 1;
         else
@@ -501,7 +499,7 @@ void execute(int arguments[])
         PC = branch(ALU_output, imm_);
     }
     else if (operation == 21)
-    {
+    {//bne
         if (X[rs1_] != X[rs2_])
             ALU_output = 1;
         else
@@ -509,7 +507,7 @@ void execute(int arguments[])
         PC = branch(ALU_output, imm_);
     }
     else if (operation == 22)
-    {
+    {//bge
         if (X[rs1_] >= X[rs2_])
             ALU_output = 1;
         else
@@ -517,7 +515,7 @@ void execute(int arguments[])
         PC = branch(ALU_output, imm_);
     }
     else if (operation == 23)
-    {
+    {//blt
         if (X[rs1_] < X[rs2_])
             ALU_output = 1;
         else
@@ -525,31 +523,31 @@ void execute(int arguments[])
         PC = branch(ALU_output, imm_);
     }
     else if (operation == 24)
-    {
+    {//jal
         ALU_output = PC + 4;
         PC = PC + imm_;
         printf("jump to %X",PC);
     }
     else if (operation == 25)
-    {
+    {//lui
         ALU_output = imm_ << 12;
         printf("imm is shifted by 12")
     }
     else if (operation == 26)
-    {
+    {//auipc
         ALU_output = PC + (imm_ << 12);
-        printf("operation PC+(imm<<12)")
+        printf("operation: PC+(imm<<12)")
     }
 }
 
 // perform the memory operation
 void memory_access(int arguments[])
 {
-    if(arguments[0]==13|arguments[0]==14|arguments[0]==15)
+    if(arguments[0]==13||arguments[0]==14||arguments[0]==15)
     {
         
     }
-    else if(arguments[0]==17|arguments[0]==18|arguments[0]==19);
+    else if(arguments[0]==17||arguments[0]==18||arguments[0]==19);
 }
 
 // writes the results back to register file

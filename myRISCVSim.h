@@ -87,7 +87,7 @@ void dectobin(int num, int *b, int size)
 void fetch(int *IR);
 void decode(int IR[],int *arguments);
 void execute(int arguments[]);
-void memory_access(int arguments[]);
+void memory_access(int *memory);
 void write_back();
 int read_word(char *mem, unsigned int address);
 void write_word(char *mem, unsigned int address, unsigned int data);
@@ -100,7 +100,7 @@ void run_riscvsim()
         fetch(IR);
         decode(IR,arguments);
         execute(arguments);
-        memory_access(arguments);
+        memory_access(MEM);
         write_back();
     }
 }
@@ -541,13 +541,52 @@ void execute(int arguments[])
 }
 
 // perform the memory operation
-void memory_access(int arguments[])
+void memory_access(int *Memory)
 {
-    if(arguments[0]==13||arguments[0]==14||arguments[0]==15)
+    int operation=arguments[0],MA_output, array[32], bin13[9], bin14[17], bin15[33], output;
+    int rs1 = arguments[1], bin17[9], bin18[17], bin19[33];
+    int num = X[rs1];
+    if (operation == 13 || operation == 14 || operation == 15)
     {
-        
+        output = Memory[ALU_output];
+        dectobin(output, array, 32, 1);
+        for (int i = 0; i < 32; i++)
+        {
+            if (i < 8 && operation == 13)
+                bin13[i] = array[7 - i];
+            if (i < 16 && operation == 14)
+                bin14[i] = array[15 - i];
+            if (i < 32 && operation == 15)
+                bin15[i] = array[31 - i];
+        }
+        if (operation == 13)
+            MA_output = bintodec(bin13, 8, 1);
+        else if (operation == 14)
+            MA_output = bintodec(bin14, 16, 1);
+        else if (operation == 15)
+            MA_output = bintodec(bin15, 32, 1);
     }
-    else if(arguments[0]==17||arguments[0]==18||arguments[0]==19);
+    else if (operation == 17 || operation == 18 || operation == 19)
+    {
+        dectobin(num, array, 32, 1);
+        for (int i = 0; i < 32; i++)
+        {
+            if (i < 8 && operation == 17)
+                bin17[i] = array[7 - i];
+            if (i < 16 && operation == 18)
+                bin18[i] = array[15 - i];
+            if (i < 32 && operation == 19)
+                bin19[i] = array[31 - i];
+        }
+        if (operation == 17)
+            MEM[ALU_output] = bintodec(bin17, 8, 1);
+        if (operation == 18)
+            MEM[ALU_output] = bintodec(bin18, 16, 1);
+        if (operation == 19)
+            MEM[ALU_output] = bintodec(bin19, 32, 1);
+    }
+    else 
+        printf("No need for memory access for this instruction");
 }
 
 // writes the results back to register file

@@ -12,6 +12,7 @@ int leninst;
 int IR[32];
 int PC;
 int arguments[5];
+int ALU_output;
 
 // intermediate datapath and control path signals
 static unsigned int instruction_word;
@@ -171,6 +172,16 @@ void swi_exit()
 {
     write_data_memory();
     exit(0);
+}
+
+int branch(int taken, int imm)
+{
+    if (taken == 1)
+        printf("Branch is taken");
+    else
+        printf("Branch is not taken");
+    PC = PC + imm;
+    return PC;
 }
 
 // reads from the instruction memory and updates the instruction register
@@ -410,6 +421,125 @@ void decode(int IR[],int *arguments)
 // executes the ALU operation based on ALUop
 void execute(int arguments[])
 {
+    int operation = arguments[0];
+    int rs1_ = arguments[1];
+    int rs2_ = arguments[2];
+    int rd_ = arguments[3];
+    int imm_ = arguments[4];
+    int ALU_output;
+    if (operation == 1)
+    { // add
+        ALU_output = X[rs1_] + X[rs2_];
+        printf("ALU output of the add instruction is %d", ALU_output);
+    }
+    else if (operation == 2)
+    { // sub
+        ALU_output = X[rs1_] - X[rs2_];
+        printf("ALU output of the sub instruction is %d", ALU_output);
+    }
+    else if (operation == 3)
+    { // sll
+        ALU_output = X[rs1_] << X[rs2_];
+        printf("ALU output of the sll instruction is %d", ALU_output);
+    }
+    else if (operation == 4)
+    { // slt
+        ALU_output = X[rs1_] << X[rs2_];
+        printf("ALU output of the slt instruction is %d", ALU_output);
+    }
+    else if (operation == 5)
+    { // xor
+        ALU_output = X[rs1_] ^ X[rs2_];
+        printf("ALU output of the xor instruction is %d", ALU_output);
+    }
+    else if (operation == 6)
+    { // or
+        ALU_output = X[rs1_] | X[rs2_];
+        printf("ALU output of the or instruction is %d", ALU_output);
+    }
+    else if (operation == 7)
+    { // and
+        ALU_output = X[rs1_] & X[rs2_];
+        printf("ALU output of the sll instruction is %d", ALU_output);
+    }
+    else if (operation == 8)
+    { // srl
+        ALU_output = X[rs1_] << X[rs2_];
+        printf("ALU output of the srl instruction is %d", ALU_output);
+    }
+    else if (operation == 9)
+    { // sra
+        ALU_output = X[rs1_] << X[rs2_];
+        printf("ALU output of the sra instruction is %d", ALU_output);
+    }
+    else if (operation == 10)
+    { // addi
+        ALU_output = X[rs1_] + imm_;
+        printf("ALU output of the addi instruction is %d", ALU_output);
+    }
+    else if (operation == 11)
+    { // andi
+        ALU_output = X[rs1_] & imm_;
+        printf("ALU output of the andi instruction is %d", ALU_output);
+    }
+    else if (operation == 12)
+    { // ori
+        ALU_output = X[rs1_] | imm_;
+        printf("ALU output of the ori instruction is %d", ALU_output);
+    }
+    else if (operation > 12 && operation < 20)
+    { // lb lh lw jalr sb sh sw
+        ALU_output = X[rs1_] + imm_;
+        printf("ALU output of the instruction is %d", ALU_output);
+    }
+    else if (operation == 20)
+    {
+        if (X[rs1_] == X[rs2_])
+            ALU_output = 1;
+        else
+            ALU_output = 0;
+        PC = branch(ALU_output, imm_);
+    }
+    else if (operation == 21)
+    {
+        if (X[rs1_] != X[rs2_])
+            ALU_output = 1;
+        else
+            ALU_output = 0;
+        PC = branch(ALU_output, imm_);
+    }
+    else if (operation == 22)
+    {
+        if (X[rs1_] >= X[rs2_])
+            ALU_output = 1;
+        else
+            ALU_output = 0;
+        PC = branch(ALU_output, imm_);
+    }
+    else if (operation == 23)
+    {
+        if (X[rs1_] < X[rs2_])
+            ALU_output = 1;
+        else
+            ALU_output = 0;
+        PC = branch(ALU_output, imm_);
+    }
+    else if (operation == 24)
+    {
+        ALU_output = PC + 4;
+        PC = PC + imm_;
+        printf("jump to %X",PC);
+    }
+    else if (operation == 25)
+    {
+        ALU_output = imm_ << 12;
+        printf("imm is shifted by 12")
+    }
+    else if (operation == 26)
+    {
+        ALU_output = PC + (imm_ << 12);
+        printf("operation PC+(imm<<12)")
+    }
 }
 
 // perform the memory operation

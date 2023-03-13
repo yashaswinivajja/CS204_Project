@@ -134,7 +134,7 @@ void load_program_memory(char *file_name)
         exit(1);
     }
     int i = 0;
-    while (fscanf(fp, "%x %x", &address, &instruction) != EOF)
+    while (fscanf(fp, "%X %X", &address, &instruction) != EOF)
     {
         int Arr[32];
         dectobin(instruction, Arr, 32);
@@ -161,7 +161,7 @@ void write_data_memory()
 
     for (i = 0; i < 4000; i = i + 4)
     {
-        fprintf(fp, "%x %x\n", i, read_word(MEM, i));
+        fprintf(fp, "%X %X\n", i, read_word(MEM, i));
     }
     fclose(fp);
 }

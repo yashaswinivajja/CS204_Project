@@ -601,11 +601,11 @@ void memory_access(int *Memory)
                 bin19[i] = array[31 - i];
         }
         if (operation == 17)
-            MEM[ALU_output] = bintodec(bin17, 8, 1);
+            Memory[ALU_output] = bintodec(bin17, 8, 1);
         if (operation == 18)
-            MEM[ALU_output] = bintodec(bin18, 16, 1);
+            Memory[ALU_output] = bintodec(bin18, 16, 1);
         if (operation == 19)
-            MEM[ALU_output] = bintodec(bin19, 32, 1);
+            Memory[ALU_output] = bintodec(bin19, 32, 1);
     }
     else
         printf("No need for memory access for this instruction");

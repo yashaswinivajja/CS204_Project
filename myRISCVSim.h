@@ -19,22 +19,22 @@ static unsigned int instruction_word;
 static unsigned int operand1;
 static unsigned int operand2;
 
-int bintodec(int bin[], int size, bool k)
+int bintodec(int bin[], int size, int k)
 {
     int dec = 0, j = 1;
     for (int i = size - 1; i > 0; i--)
     {
         dec = dec + (bin[i] * (j));
-        j=j*2;
+        j = j * 2;
     }
-    if(k==1)
-    dec=dec+((-1)*j*bin[0]);
+    if (k == 1)
+        dec = dec + ((-1) * j * bin[0]);
     else
-    dec = dec+(j*bin[0]);
+        dec = dec + (j * bin[0]);
     return dec;
 }
 
-void dectobin(int num, int *b, int size)
+void dectobin(int num, int *b, int size, int k)
 {
     int rem, i = 0;
     if (num >= 0)
@@ -47,9 +47,29 @@ void dectobin(int num, int *b, int size)
             array[i] = rem;
             i++;
         }
-        for (i = size - 1; i >= 0; i--)
+        if (k == 0)
         {
-            b[size - 1 - i] = array[i];
+            for (i = size - 1; i >= 0; i--)
+            {
+                b[size - 1 - i] = array[i];
+            }
+        }
+        else if (k == 1)
+        {
+            for (i = size - 1; i >= 0; i--)
+            {
+                b[i] = array[i];
+            }
+        }
+        else if (k == 2)
+        {
+            while (num > 0)
+            {
+                rem = num % 2;
+                num = num / 2;
+                b[i] = rem;
+                i++;
+            }
         }
     }
     else
@@ -85,7 +105,7 @@ void dectobin(int num, int *b, int size)
 }
 
 void fetch(int *IR);
-void decode(int IR[],int *arguments);
+void decode(int IR[], int *arguments);
 void execute(int arguments[]);
 void memory_access(int *memory);
 void write_back();
@@ -98,7 +118,7 @@ void run_riscvsim()
     {
         int IR[32];
         fetch(IR);
-        decode(IR,arguments);
+        decode(IR, arguments);
         execute(arguments);
         memory_access(MEM);
         write_back();
@@ -137,7 +157,7 @@ void load_program_memory(char *file_name)
     while (fscanf(fp, "%X %X", &address, &instruction) != EOF)
     {
         int Arr[32];
-        dectobin(instruction, Arr, 32);
+        dectobin(instruction, Arr, 32,0);
         for (int j = 0; j < 32; j++)
             Machinecode[i][j] = Arr[j];
         write_word(MEM, address, instruction);
@@ -191,10 +211,10 @@ void fetch(int *IR)
 }
 
 // reads the instruction register, reads operand1, operand2 fromo register file, decides the operation to be performed in execute stage
-void decode(int IR[],int *arguments)
+void decode(int IR[], int *arguments)
 {
     int opcode[8], func3[4], func7[8], rs1[6], rs2[6], rd[6], imm[21];
-    int RS1, RS2, RD, Opcode, fun7, fun3,operation,Imm=0;
+    int RS1, RS2, RD, Opcode, fun7, fun3, operation, Imm = 0;
     // opcode=IR[6:0]    func3=IR[14:12] rd=IR[11:7] rs1=IR[19:15]   rs2=IR[24:20]   func7=IR[31:25]
     for (int i = 0; i <= 6; i++)
     {
@@ -203,216 +223,218 @@ void decode(int IR[],int *arguments)
         if (i <= 2)
             func3[i] = IR[14 - i];
     }
-    Opcode = bintodec(opcode, 7,0);
-    fun7 = bintodec(func7, 7,0);
-    fun3 = bintodec(func3, 3,0);
+    Opcode = bintodec(opcode, 7, 0);
+    fun7 = bintodec(func7, 7, 0);
+    fun3 = bintodec(func3, 3, 0);
     for (int i = 0; i <= 4; i++)
     {
         rs1[i] = IR[19 - i];
         rs2[i] = IR[24 - i];
         rd[i] = IR[11 - i];
     }
-    RS1 = bintodec(rs1, 5,0);
-    RS2 = bintodec(rs2, 5,0);
-    RD = bintodec(rd, 5,0);
-    if(Opcode==51)
+    RS1 = bintodec(rs1, 5, 0);
+    RS2 = bintodec(rs2, 5, 0);
+    RD = bintodec(rd, 5, 0);
+    if (Opcode == 51)
     {
-       if(fun3==0 && fun7==0)
-        {//add
-            operation=1;
-            printf("operation: add rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
+        if (fun3 == 0 && fun7 == 0)
+        { // add
+            operation = 1;
+            printf("operation: add rs1: %d rs2: %d rd: %d", RS1, RS2, RD);
         }
-        else if(fun3==0 && fun7==32)
-        {//sub
-            operation=2;
-            printf("operation: sub rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
+        else if (fun3 == 0 && fun7 == 32)
+        { // sub
+            operation = 2;
+            printf("operation: sub rs1: %d rs2: %d rd: %d", RS1, RS2, RD);
         }
-        else if(fun3==1)
-        {//sll
-            operation=3;
-            printf("operation: sll rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
+        else if (fun3 == 1)
+        { // sll
+            operation = 3;
+            printf("operation: sll rs1: %d rs2: %d rd: %d", RS1, RS2, RD);
         }
-        else if(fun3==2)
-        {//slt
-            operation=4;
-            printf("operation: slt rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
+        else if (fun3 == 2)
+        { // slt
+            operation = 4;
+            printf("operation: slt rs1: %d rs2: %d rd: %d", RS1, RS2, RD);
         }
-        else if(fun3==4)
-        {//xor
-            operation=5;
-            printf("operation: xor rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
+        else if (fun3 == 4)
+        { // xor
+            operation = 5;
+            printf("operation: xor rs1: %d rs2: %d rd: %d", RS1, RS2, RD);
         }
-        else if(fun3==6)
-        {//or
-            operation=6;
-            printf("operation: or rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
+        else if (fun3 == 6)
+        { // or
+            operation = 6;
+            printf("operation: or rs1: %d rs2: %d rd: %d", RS1, RS2, RD);
         }
-        else if(fun3==7)
-        {//and
-            operation=7;
-            printf("operation: and rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
+        else if (fun3 == 7)
+        { // and
+            operation = 7;
+            printf("operation: and rs1: %d rs2: %d rd: %d", RS1, RS2, RD);
         }
-        else if(fun3==5 && fun7==0)
-        {//srl
-            operation=8;
-            printf("operation: srl rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
+        else if (fun3 == 5 && fun7 == 0)
+        { // srl
+            operation = 8;
+            printf("operation: srl rs1: %d rs2: %d rd: %d", RS1, RS2, RD);
         }
-        else if(fun3==5 && fun7==32)
-        {//sra
-            operation=9;
-            printf("operation: sra rs1: %d rs2: %d rd: %d",RS1,RS2,RD);
+        else if (fun3 == 5 && fun7 == 32)
+        { // sra
+            operation = 9;
+            printf("operation: sra rs1: %d rs2: %d rd: %d", RS1, RS2, RD);
         }
     }
-    else if(Opcode==19)
+    else if (Opcode == 19)
     {
-        for(int i=11;i>=0;i--)
+        for (int i = 11; i >= 0; i--)
         {
-            imm[i]=IR[20+i];
+            imm[i] = IR[20 + i];
         }
-        Imm = bintodec(imm,12,1);       
-        if(fun3==0)
-        {//addi
-            operation=10;
-            printf("Operation: addi rs1: %d rd: %d imm: %d",RS1,RD,Imm);
+        Imm = bintodec(imm, 12, 1);
+        if (fun3 == 0)
+        { // addi
+            operation = 10;
+            printf("Operation: addi rs1: %d rd: %d imm: %d", RS1, RD, Imm);
         }
-        else if(fun3==7)
-        {//andi
-            operation=11;
-            printf("Operation: andi rs1: %d rd: %d imm: %d",RS1,RD,Imm);
+        else if (fun3 == 7)
+        { // andi
+            operation = 11;
+            printf("Operation: andi rs1: %d rd: %d imm: %d", RS1, RD, Imm);
         }
-        else if(fun3==6)
-        {//ori
-            operation=12;
-            printf("Operation: ori rs1: %d rd: %d imm: %d",RS1,RD,Imm);
-        } 
-    }
-   else if(Opcode==3)
-    {
-        for(int i=11;i>=0;i--)
-        {
-            imm[i]=IR[20+i];
-        }
-        Imm=bintodec(imm,12,1); 
-        if(fun3==0)
-        {//lb
-            operation=13;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);  
-        }
-        else if(fun3==1)
-        {//lh
-            operation=14;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);
-        }
-        else if(fun3==2)
-        {//lw
-            operation=15;
-            printf("Operation: load rs1: %d rd: %d imm: %d",RS1,RD,Imm);
+        else if (fun3 == 6)
+        { // ori
+            operation = 12;
+            printf("Operation: ori rs1: %d rd: %d imm: %d", RS1, RD, Imm);
         }
     }
-    else if(Opcode==103)
+    else if (Opcode == 3)
     {
-        for(int i=11;i>=0;i--)
+        for (int i = 11; i >= 0; i--)
         {
-            imm[i]=IR[20+i];
+            imm[i] = IR[20 + i];
         }
-        Imm = bintodec(imm,12,1);
-        if(fun3==0)
-        {//jalr
-            operation=16;
-            printf("Operation: jalr rs1: %d rd: %d imm: %d",RS1,RD,Imm);
+        Imm = bintodec(imm, 12, 1);
+        if (fun3 == 0)
+        { // lb
+            operation = 13;
+            printf("Operation: load rs1: %d rd: %d imm: %d", RS1, RD, Imm);
+        }
+        else if (fun3 == 1)
+        { // lh
+            operation = 14;
+            printf("Operation: load rs1: %d rd: %d imm: %d", RS1, RD, Imm);
+        }
+        else if (fun3 == 2)
+        { // lw
+            operation = 15;
+            printf("Operation: load rs1: %d rd: %d imm: %d", RS1, RD, Imm);
         }
     }
-    else if(Opcode==35)
+    else if (Opcode == 103)
     {
-        for(int i=11;i>=0;i--)
+        for (int i = 11; i >= 0; i--)
         {
-            if(i<=11 && i>=5){
-                imm[i]=IR[20+i];
+            imm[i] = IR[20 + i];
+        }
+        Imm = bintodec(imm, 12, 1);
+        if (fun3 == 0)
+        { // jalr
+            operation = 16;
+            printf("Operation: jalr rs1: %d rd: %d imm: %d", RS1, RD, Imm);
+        }
+    }
+    else if (Opcode == 35)
+    {
+        for (int i = 11; i >= 0; i--)
+        {
+            if (i <= 11 && i >= 5)
+            {
+                imm[i] = IR[20 + i];
             }
-            else if(i<=4 && i>=0){
-                imm[i]=IR[i+7];
+            else if (i <= 4 && i >= 0)
+            {
+                imm[i] = IR[i + 7];
             }
         }
-        Imm=bintodec(imm,12,1);
-        if(fun3==0)
-        {//sb
-            operation=17;
-            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);            
+        Imm = bintodec(imm, 12, 1);
+        if (fun3 == 0)
+        { // sb
+            operation = 17;
+            printf("Operation: store rs1: %d rs2: %d imm: %d", RS1, RS2, Imm);
         }
-        else if(fun3==1)
-        {//sh
-            operation=18;
-            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);       
+        else if (fun3 == 1)
+        { // sh
+            operation = 18;
+            printf("Operation: store rs1: %d rs2: %d imm: %d", RS1, RS2, Imm);
         }
-        else if(fun3==2)
-        {//sw
-            operation=19;
-            printf("Operation: store rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);       
+        else if (fun3 == 2)
+        { // sw
+            operation = 19;
+            printf("Operation: store rs1: %d rs2: %d imm: %d", RS1, RS2, Imm);
         }
     }
-    else if(Opcode==101)
+    else if (Opcode == 101)
     {
-        for(int i=11;i>=0;i--)
+        for (int i = 11; i >= 0; i--)
         {
-            imm[11]=IR[31];
-            imm[10]=IR[7];
-            if(i<=9 && i>=4)
-            imm[i]=IR[21+i];
-            else if(i<=3 && i>=0)
-            imm[i]=IR[8+i];
+            imm[11] = IR[31];
+            imm[10] = IR[7];
+            if (i <= 9 && i >= 4)
+                imm[i] = IR[21 + i];
+            else if (i <= 3 && i >= 0)
+                imm[i] = IR[8 + i];
         }
-        Imm=bintodec(imm,12,1);
-        if(fun3==0)
-        {//beq
+        Imm = bintodec(imm, 12, 1);
+        if (fun3 == 0)
+        { // beq
             operation = 20;
-            printf("Operation: beq rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
+            printf("Operation: beq rs1: %d rs2: %d imm: %d", RS1, RS2, Imm);
         }
-        else if(fun3==1)
-        {//bne
+        else if (fun3 == 1)
+        { // bne
             operation = 21;
-            printf("Operation: bne rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
+            printf("Operation: bne rs1: %d rs2: %d imm: %d", RS1, RS2, Imm);
         }
-        else if(fun3==5)
-        {//bge
+        else if (fun3 == 5)
+        { // bge
             operation = 22;
-            printf("Operation: bge rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);
+            printf("Operation: bge rs1: %d rs2: %d imm: %d", RS1, RS2, Imm);
         }
-        else if(fun3==4)
-        {//blt
+        else if (fun3 == 4)
+        { // blt
             operation = 23;
-            printf("Operation: blt rs1: %d rs2: %d imm: %d",RS1,RS2,Imm);   
+            printf("Operation: blt rs1: %d rs2: %d imm: %d", RS1, RS2, Imm);
         }
     }
-    else if(Opcode==111)
-    {//jal
+    else if (Opcode == 111)
+    { // jal
         operation = 24;
-        printf("Operation: jal rd: %d imm: %d",RD,Imm);
+        printf("Operation: jal rd: %d imm: %d", RD, Imm);
     }
-    else if(Opcode==55)
-    {//lui
-        for(int i=19;i>=0;i--)
+    else if (Opcode == 55)
+    { // lui
+        for (int i = 19; i >= 0; i--)
         {
-            imm[i]=IR[12+i];
+            imm[i] = IR[12 + i];
         }
-        Imm = bintodec(imm ,20,1);
+        Imm = bintodec(imm, 20, 1);
         operation = 25;
-        printf("Operation: lui rd: %d imm: %d",RD,Imm);
+        printf("Operation: lui rd: %d imm: %d", RD, Imm);
     }
-    else if(Opcode==23)
-    {//auipc
-        for(int i=19;i>=0;i--)
+    else if (Opcode == 23)
+    { // auipc
+        for (int i = 19; i >= 0; i--)
         {
-            imm[i]=IR[12+i];
+            imm[i] = IR[12 + i];
         }
-        Imm = bintodec(imm ,20,1);
+        Imm = bintodec(imm, 20, 1);
         operation = 26;
-        printf("Operation: auipc rd: %d imm: %d",RD,Imm);
+        printf("Operation: auipc rd: %d imm: %d", RD, Imm);
     }
-    arguments[0]=operation;
-    arguments[1]=RS1;
-    arguments[2]=RS2;
-    arguments[3]=RD;
-    arguments[4]=Imm;
+    arguments[0] = operation;
+    arguments[1] = RS1;
+    arguments[2] = RS2;
+    arguments[3] = RD;
+    arguments[4] = Imm;
 }
 
 // executes the ALU operation based on ALUop
@@ -424,7 +446,7 @@ void execute(int arguments[])
     int rd_ = arguments[3];
     int imm_ = arguments[4];
     int ALU_output;
-    PC=PC+4;
+    PC = PC + 4;
     if (operation == 1)
     { // add
         ALU_output = X[rs1_] + X[rs2_];
@@ -491,7 +513,7 @@ void execute(int arguments[])
         printf("ALU output of the instruction is %d", ALU_output);
     }
     else if (operation == 20)
-    {//beq
+    { // beq
         if (X[rs1_] == X[rs2_])
             ALU_output = 1;
         else
@@ -499,7 +521,7 @@ void execute(int arguments[])
         PC = branch(ALU_output, imm_);
     }
     else if (operation == 21)
-    {//bne
+    { // bne
         if (X[rs1_] != X[rs2_])
             ALU_output = 1;
         else
@@ -507,7 +529,7 @@ void execute(int arguments[])
         PC = branch(ALU_output, imm_);
     }
     else if (operation == 22)
-    {//bge
+    { // bge
         if (X[rs1_] >= X[rs2_])
             ALU_output = 1;
         else
@@ -515,7 +537,7 @@ void execute(int arguments[])
         PC = branch(ALU_output, imm_);
     }
     else if (operation == 23)
-    {//blt
+    { // blt
         if (X[rs1_] < X[rs2_])
             ALU_output = 1;
         else
@@ -523,27 +545,27 @@ void execute(int arguments[])
         PC = branch(ALU_output, imm_);
     }
     else if (operation == 24)
-    {//jal
+    { // jal
         ALU_output = PC + 4;
         PC = PC + imm_;
-        printf("jump to %X",PC);
+        printf("jump to %X", PC);
     }
     else if (operation == 25)
-    {//lui
+    { // lui
         ALU_output = imm_ << 12;
-        printf("imm is shifted by 12")
+        printf("imm is shifted by 12");
     }
     else if (operation == 26)
-    {//auipc
+    { // auipc
         ALU_output = PC + (imm_ << 12);
-        printf("operation: PC+(imm<<12)")
+        printf("operation: PC+(imm<<12)");
     }
 }
 
 // perform the memory operation
 void memory_access(int *Memory)
 {
-    int operation=arguments[0],MA_output, array[32], bin13[9], bin14[17], bin15[33], output;
+    int operation = arguments[0], MA_output, array[32], bin13[9], bin14[17], bin15[33], output;
     int rs1 = arguments[1], bin17[9], bin18[17], bin19[33];
     int num = X[rs1];
     if (operation == 13 || operation == 14 || operation == 15)
@@ -585,7 +607,7 @@ void memory_access(int *Memory)
         if (operation == 19)
             MEM[ALU_output] = bintodec(bin19, 32, 1);
     }
-    else 
+    else
         printf("No need for memory access for this instruction");
 }
 
